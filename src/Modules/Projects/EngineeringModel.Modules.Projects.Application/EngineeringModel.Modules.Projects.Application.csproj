@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../EngineeringModel.Modules.Projects.Domain/EngineeringModel.Modules.Projects.Domain.csproj" />
+    <ProjectReference Include="../../../BuildingBlocks/EngineeringModel.BuildingBlocks/EngineeringModel.BuildingBlocks.csproj" />
+  </ItemGroup>
+</Project>
