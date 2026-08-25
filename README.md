@@ -49,7 +49,7 @@ The SQLite and no-ORM choices keep the PoC self-contained; they are not universa
 .
 ├── docs/
 │   ├── business/                    # Business Source of Truth
-│   ├── architecture/                # Intended architecture + verification map
+│   ├── architecture/                # Architecture, living map, C4 + drift view
 │   ├── decisions/                   # ADRs
 │   └── engineering-model/           # Engineering Knowledge & Verification Model
 ├── specs/                           # C/D change plans only
@@ -194,18 +194,59 @@ CLAUDE.md
 .claude/skills/
    ├─ plan-change/      (C/D planning only)
    ├─ verify-change/    (selects shared verify profile)
-   └─ review-change/    (independent challenge, no silent rewrite)
+   ├─ review-change/    (independent challenge, no silent rewrite)
+   └─ arch-wiki/        (optional living architecture + C4 + drift dashboard)
 ```
 
 There is intentionally **no** AI-only architecture checker, no permanent multi-agent pipeline, and no duplicate governance system.
 
 The future Skill for generating/updating executable tests from approved Source of Truth is intentionally **not included** in this PoC; that capability should be added only after the core model is proven.
 
+## Optional living architecture — arch-wiki
+
+`arch-wiki` treats the codebase as **observed architecture reality** and compares it with architecture documentation/ADRs before synchronizing the living map.
+
+```text
+Observed Code ──────┐
+                    ├─> Compare ─> MATCH | CODE_ONLY | DOCS_ONLY | CONFLICT
+Recorded Docs/ADRs ─┘                      │
+                                           ▼
+                              Smart drift/conflict record
+                                           │
+                                           ▼
+                              architecture.json + C4 dashboard
+```
+
+A conflict is never reduced to “docs differ from code”. The dashboard shows:
+
+**Expected → Observed → Code Location → Docs/ADR Location → Why → Impact → Resolution**
+
+C4 usage is intentionally bounded:
+
+- C1 System Context — always;
+- C2 Containers — when applicable;
+- C3 Components — per important module/service;
+- C4 Code — on demand only.
+
+The current reference manifest is `docs/architecture/architecture.json`. Generate the dashboard with:
+
+```bash
+python docs/architecture/build_html.py
+```
+
+Generate a clearly-labelled synthetic conflict for an architect demo without changing the live manifest:
+
+```bash
+python docs/architecture/build_html.py --demo-conflict --output docs/architecture/architecture-conflict-demo.html
+```
+
+This Skill is a visibility/drift layer. NetArchTest + CI still own deterministic enforcement.
+
 ## Claude permission posture
 
 `.claude/settings.json` demonstrates least privilege:
 
-- allow normal `dotnet` verification and read-only Git inspection;
+- allow normal `dotnet` verification, architecture dashboard generation, and read-only Git inspection;
 - ask before `git commit`;
 - deny `git push` and sensitive `.env`/secret reads.
 
@@ -238,8 +279,9 @@ CI is authoritative because local hooks can be bypassed or misconfigured.
 6. Run `PrePush` green.
 7. Run `demo-architecture-violation.ps1` — show architecture drift rejected mechanically.
 8. Open `CLAUDE.md` — show Claude is routed into the existing engineering system rather than becoming a second one.
-9. Show the `Main` CI/template smoke result — prove the repository also generates a valid renamed starter solution.
-10. End with the key claim: **normal engineering first; AI optional; critical objective rules deterministic.**
+9. Optionally show `arch-wiki` conflict dashboard — connect code evidence, docs/ADR evidence and C4 impact.
+10. Show the `Main` CI/template smoke result — prove the repository also generates a valid renamed starter solution.
+11. End with the key claim: **normal engineering first; AI optional; critical objective rules deterministic.**
 
 ## Run the application
 
