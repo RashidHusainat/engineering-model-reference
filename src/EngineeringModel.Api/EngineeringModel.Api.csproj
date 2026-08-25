@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="../Modules/Projects/EngineeringModel.Modules.Projects.Application/EngineeringModel.Modules.Projects.Application.csproj" />
+    <ProjectReference Include="../Modules/Projects/EngineeringModel.Modules.Projects.Contracts/EngineeringModel.Modules.Projects.Contracts.csproj" />
+    <ProjectReference Include="../Modules/Projects/EngineeringModel.Modules.Projects.Infrastructure/EngineeringModel.Modules.Projects.Infrastructure.csproj" />
+    <ProjectReference Include="../Modules/WorkItems/EngineeringModel.Modules.WorkItems.Application/EngineeringModel.Modules.WorkItems.Application.csproj" />
+    <ProjectReference Include="../Modules/WorkItems/EngineeringModel.Modules.WorkItems.Infrastructure/EngineeringModel.Modules.WorkItems.Infrastructure.csproj" />
+    <ProjectReference Include="../BuildingBlocks/EngineeringModel.BuildingBlocks/EngineeringModel.BuildingBlocks.csproj" />
+  </ItemGroup>
+</Project>
