@@ -16,6 +16,10 @@ dotnet_style_qualification_for_property = false:suggestion
 dotnet_style_qualification_for_method = false:suggestion
 csharp_style_namespace_declarations = file_scoped:suggestion
 
+[tests/**/*.cs]
+# Test names intentionally use Method_WhenCondition_ShouldOutcome style.
+dotnet_diagnostic.CA1707.severity = none
+
 [*.{json,yml,yaml,md}]
 indent_style = space
 indent_size = 2
