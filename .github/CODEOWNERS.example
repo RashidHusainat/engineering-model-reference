@@ -1,0 +1,7 @@
+# Example only. Rename to CODEOWNERS after replacing placeholders with real users/teams.
+/docs/architecture/       @architecture-team
+/docs/decisions/          @architecture-team
+/src/Modules/Projects/    @projects-team
+/src/Modules/WorkItems/   @workitems-team
+/eng/                     @engineering-enablement
+/.github/workflows/       @engineering-enablement
