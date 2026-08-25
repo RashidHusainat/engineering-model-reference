@@ -13,6 +13,7 @@ $unitTests = @(
 )
 $architectureTests = "tests/EngineeringModel.ArchitectureTests/EngineeringModel.ArchitectureTests.csproj"
 $integrationTests = "tests/EngineeringModel.Api.IntegrationTests/EngineeringModel.Api.IntegrationTests.csproj"
+$templateSmoke = Join-Path $repoRoot "eng/template-smoke.ps1"
 
 function Invoke-DotNet {
     param([Parameter(Position = 0, ValueFromRemainingArguments = $true)][string[]]$Arguments)
@@ -49,6 +50,14 @@ try {
 
     if ($Profile -in @("Pr", "Main")) {
         Invoke-TestProject $integrationTests
+    }
+
+    if ($Profile -eq "Main") {
+        Write-Host "Running reusable-template smoke verification..." -ForegroundColor Cyan
+        & $templateSmoke
+        if ($LASTEXITCODE -ne 0) {
+            throw "Template smoke verification failed with exit code $LASTEXITCODE"
+        }
     }
 
     Write-Host "Verification passed: $Profile" -ForegroundColor Green
