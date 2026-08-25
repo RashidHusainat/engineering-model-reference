@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../EngineeringModel.Modules.Projects.Application/EngineeringModel.Modules.Projects.Application.csproj" />
+    <ProjectReference Include="../EngineeringModel.Modules.Projects.Domain/EngineeringModel.Modules.Projects.Domain.csproj" />
+    <ProjectReference Include="../EngineeringModel.Modules.Projects.Contracts/EngineeringModel.Modules.Projects.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+  </ItemGroup>
+</Project>
