@@ -98,8 +98,4 @@ workItems.MapGet("/{id:guid}", async (
 
 app.Run();
 
-public sealed record CreateProjectRequest(string Name);
-
-public sealed record CreateWorkItemRequest(Guid ProjectId, string Title);
-
 public partial class Program;
