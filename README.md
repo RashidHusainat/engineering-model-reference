@@ -1,5 +1,7 @@
 # Engineering Model Reference — Modular Monolith + Claude Code
 
+[![engineering-verification](https://github.com/RashidHusainat/engineering-model-reference/actions/workflows/ci.yml/badge.svg)](https://github.com/RashidHusainat/engineering-model-reference/actions/workflows/ci.yml)
+
 > An executable Proof of Concept for a lightweight **Engineering Knowledge & Verification Model**, implemented as a real .NET modular monolith with DDD-oriented boundaries and a thin Claude Code layer.
 
 This repository is intentionally substantial enough to discuss with a Software Architect, but small enough that the engineering model remains visible. It is inspired by the modular decomposition discipline demonstrated by `kgrzybek/modular-monolith-with-ddd`; the code and domain here are original and deliberately smaller.
@@ -132,12 +134,18 @@ The architecture test does not “discover” this design. The team decides the 
 | `PreCommit` | very fast local feedback | restore + build/analyzers |
 | `PrePush` | normal local gate | build + unit + architecture tests |
 | `Pr` | pull-request CI | build + unit + architecture + integration tests |
-| `Main` | main/integration stage | current PoC uses the same deep evidence as PR |
+| `Main` | authoritative main-branch verification | PR evidence + generated-template smoke verification |
 
 Run manually:
 
 ```powershell
 ./eng/verify.ps1 -Profile PrePush
+```
+
+Run the deepest repository + template verification:
+
+```powershell
+./eng/verify.ps1 -Profile Main
 ```
 
 Install the tracked Git pre-push hook:
@@ -205,15 +213,18 @@ Repository policy and CI remain the enforcement authority. Claude permissions ar
 
 ## CI
 
-Both CI examples call the same command:
+Every caller routes into the repository-owned verification implementation:
 
 ```text
-GitHub Actions ─┐
-Azure Pipelines ├──> eng/verify.ps1 -Profile Pr
-Developer CLI ──┤
-Claude Code ────┤
-Git pre-push ───┘
+Developer CLI ───────────────┐
+Claude Code ─────────────────┤
+Git pre-push ── PrePush ─────┼──> eng/verify.ps1
+GitHub Pull Request ── Pr ───┤
+GitHub main push ── Main ─────┤
+Azure Pipelines sample ── Pr ─┘
 ```
+
+`Main` additionally installs the repository as a real `dotnet new` template, generates a renamed solution in a temporary directory, builds it, and runs its `PrePush` verification. This catches template/substitution drift that a green source repository alone would miss.
 
 CI is authoritative because local hooks can be bypassed or misconfigured.
 
@@ -227,7 +238,8 @@ CI is authoritative because local hooks can be bypassed or misconfigured.
 6. Run `PrePush` green.
 7. Run `demo-architecture-violation.ps1` — show architecture drift rejected mechanically.
 8. Open `CLAUDE.md` — show Claude is routed into the existing engineering system rather than becoming a second one.
-9. End with the key claim: **normal engineering first; AI optional; critical objective rules deterministic.**
+9. Show the `Main` CI/template smoke result — prove the repository also generates a valid renamed starter solution.
+10. End with the key claim: **normal engineering first; AI optional; critical objective rules deterministic.**
 
 ## Run the application
 
@@ -262,23 +274,23 @@ Adding all of them now would make the demonstration about tooling rather than th
 
 ## Use it as a `dotnet new` template
 
-The repository contains `.template.config/template.json`. After validating the reference implementation in your environment:
+The repository contains `.template.config/template.json`:
 
 ```powershell
 dotnet new install .
 dotnet new engmodel-mm -n Contoso.WorkManagement -o ../Contoso.WorkManagement
 ```
 
-The template engine replaces the `EngineeringModel` source name across namespaces and filenames.
+The template engine replaces the `EngineeringModel` source name across namespaces and filenames. The `Main` CI profile continuously smoke-tests this behavior by generating a `TemplateSmoke` solution and running the generated repository's verification.
 
 ## From PoC to organization template
 
-After the reference implementation is green in the target environment:
+The reference implementation and generic template are mechanically validated in CI. Before adopting it as an organization-wide starter:
 
 1. lock package/tool versions approved by the team;
 2. decide the default module skeleton;
-3. parameterize names and organization conventions;
+3. parameterize organization-specific names and conventions;
 4. retain Source-of-Truth folders, shared verification, architecture tests, CI wiring, and thin Claude integration;
 5. add only organization-specific policies that have clear ownership and an appropriate enforcement mechanism.
 
-That is the point where this PoC becomes a starter template rather than a design experiment.
+At that point, this reference becomes an organization starter template rather than a design experiment.
