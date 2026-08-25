@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../../src/Modules/WorkItems/EngineeringModel.Modules.WorkItems.Domain/EngineeringModel.Modules.WorkItems.Domain.csproj" />
+    <ProjectReference Include="../../src/Modules/WorkItems/EngineeringModel.Modules.WorkItems.Application/EngineeringModel.Modules.WorkItems.Application.csproj" />
+    <ProjectReference Include="../../src/Modules/Projects/EngineeringModel.Modules.Projects.Contracts/EngineeringModel.Modules.Projects.Contracts.csproj" />
+    <ProjectReference Include="../../src/BuildingBlocks/EngineeringModel.BuildingBlocks/EngineeringModel.BuildingBlocks.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnit3TestAdapter" />
+  </ItemGroup>
+<PropertyGroup>
+  <IsTestProject>true</IsTestProject>
+  <IsPackable>false</IsPackable>
+</PropertyGroup>
+</Project>
