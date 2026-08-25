@@ -6,7 +6,7 @@ $templateName = "TemplateSmoke"
 $installed = $false
 
 function Invoke-DotNet {
-    param([Parameter(Position = 0, ValueFromRemainingArguments = $true)][string[]]$Arguments)
+    param([string[]]$Arguments)
 
     Write-Host "dotnet $($Arguments -join ' ')" -ForegroundColor Cyan
     & dotnet @Arguments
@@ -19,10 +19,10 @@ try {
     Write-Host "=== Template Smoke Test ===" -ForegroundColor Green
     Write-Host "Installing repository as a local dotnet template..."
 
-    Invoke-DotNet new install $repoRoot --force
+    Invoke-DotNet -Arguments @("new", "install", $repoRoot, "--force")
     $installed = $true
 
-    Invoke-DotNet new engmodel-mm -n $templateName -o $tempRoot
+    Invoke-DotNet -Arguments @("new", "engmodel-mm", "-n", $templateName, "-o", $tempRoot)
 
     $generatedVerify = Join-Path $tempRoot "eng/verify.ps1"
     if (-not (Test-Path $generatedVerify)) {
