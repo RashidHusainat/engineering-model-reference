@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../../src/Modules/Projects/EngineeringModel.Modules.Projects.Domain/EngineeringModel.Modules.Projects.Domain.csproj" />
+    <ProjectReference Include="../../src/Modules/Projects/EngineeringModel.Modules.Projects.Application/EngineeringModel.Modules.Projects.Application.csproj" />
+    <ProjectReference Include="../../src/Modules/Projects/EngineeringModel.Modules.Projects.Contracts/EngineeringModel.Modules.Projects.Contracts.csproj" />
+    <ProjectReference Include="../../src/Modules/Projects/EngineeringModel.Modules.Projects.Infrastructure/EngineeringModel.Modules.Projects.Infrastructure.csproj" />
+    <ProjectReference Include="../../src/Modules/WorkItems/EngineeringModel.Modules.WorkItems.Domain/EngineeringModel.Modules.WorkItems.Domain.csproj" />
+    <ProjectReference Include="../../src/Modules/WorkItems/EngineeringModel.Modules.WorkItems.Application/EngineeringModel.Modules.WorkItems.Application.csproj" />
+    <ProjectReference Include="../../src/Modules/WorkItems/EngineeringModel.Modules.WorkItems.Infrastructure/EngineeringModel.Modules.WorkItems.Infrastructure.csproj" />
+    <ProjectReference Include="../../src/EngineeringModel.Api/EngineeringModel.Api.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnit3TestAdapter" />
+    <PackageReference Include="NetArchTest.Rules" />
+  </ItemGroup>
+<PropertyGroup>
+  <IsTestProject>true</IsTestProject>
+  <IsPackable>false</IsPackable>
+</PropertyGroup>
+</Project>
