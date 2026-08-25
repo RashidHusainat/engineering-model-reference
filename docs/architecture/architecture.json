@@ -2,7 +2,7 @@
   "meta": {
     "title": "Engineering Model Reference — Living Architecture",
     "version": "1.0.0",
-    "generatedAt": "2026-08-25",
+    "generatedAt": "2026-08-26",
     "techStack": [
       ".NET 10",
       "ASP.NET Core",
@@ -264,16 +264,102 @@
     "catalog": [],
     "details": []
   },
-  "sqlQueries": [],
+  "sqlQueries": [
+    {
+      "id": "projects-insert",
+      "label": "Insert Project",
+      "module": "Projects",
+      "file": "src/Modules/Projects/EngineeringModel.Modules.Projects.Infrastructure/SqliteProjectRepository.cs",
+      "function": "SqliteProjectRepository.AddAsync()",
+      "tables": ["projects_projects"],
+      "purpose": "Persist a newly created Draft project.",
+      "sql": "INSERT INTO projects_projects (id, name, status) VALUES ($id, $name, $status);",
+      "endpoints": [{ "method": "POST", "path": "/api/projects/" }]
+    },
+    {
+      "id": "projects-get",
+      "label": "Get Project by Id",
+      "module": "Projects",
+      "file": "src/Modules/Projects/EngineeringModel.Modules.Projects.Infrastructure/SqliteProjectRepository.cs",
+      "function": "SqliteProjectRepository.GetAsync()",
+      "tables": ["projects_projects"],
+      "purpose": "Rehydrate a Project aggregate for command handling.",
+      "sql": "SELECT id, name, status FROM projects_projects WHERE id = $id;",
+      "endpoints": [
+        { "method": "POST", "path": "/api/projects/{id:guid}/activate" },
+        { "method": "GET", "path": "/api/projects/{id:guid}" }
+      ]
+    },
+    {
+      "id": "projects-update",
+      "label": "Update Project",
+      "module": "Projects",
+      "file": "src/Modules/Projects/EngineeringModel.Modules.Projects.Infrastructure/SqliteProjectRepository.cs",
+      "function": "SqliteProjectRepository.UpdateAsync()",
+      "tables": ["projects_projects"],
+      "purpose": "Persist project status transitions (e.g. Draft -> Active).",
+      "sql": "UPDATE projects_projects SET name = $name, status = $status WHERE id = $id;",
+      "endpoints": [{ "method": "POST", "path": "/api/projects/{id:guid}/activate" }]
+    },
+    {
+      "id": "projects-catalog-find",
+      "label": "Find Project Summary (published catalog)",
+      "module": "Projects",
+      "file": "src/Modules/Projects/EngineeringModel.Modules.Projects.Infrastructure/SqliteProjectsCatalog.cs",
+      "function": "SqliteProjectsCatalog.FindAsync()",
+      "tables": ["projects_projects"],
+      "purpose": "Serve the read-only IProjectsCatalog contract consumed by WorkItems.Application to validate an active project.",
+      "sql": "SELECT id, name, status FROM projects_projects WHERE id = $id;",
+      "endpoints": [
+        { "method": "POST", "path": "/api/work-items/" }
+      ]
+    },
+    {
+      "id": "workitems-insert",
+      "label": "Insert WorkItem",
+      "module": "WorkItems",
+      "file": "src/Modules/WorkItems/EngineeringModel.Modules.WorkItems.Infrastructure/SqliteWorkItemRepository.cs",
+      "function": "SqliteWorkItemRepository.AddAsync()",
+      "tables": ["workitems_items"],
+      "purpose": "Persist a newly created WorkItem for an active Project.",
+      "sql": "INSERT INTO workitems_items (id, project_id, title, status) VALUES ($id, $projectId, $title, $status);",
+      "endpoints": [{ "method": "POST", "path": "/api/work-items/" }]
+    },
+    {
+      "id": "workitems-get",
+      "label": "Get WorkItem by Id",
+      "module": "WorkItems",
+      "file": "src/Modules/WorkItems/EngineeringModel.Modules.WorkItems.Infrastructure/SqliteWorkItemRepository.cs",
+      "function": "SqliteWorkItemRepository.GetAsync()",
+      "tables": ["workitems_items"],
+      "purpose": "Rehydrate a WorkItem aggregate for command handling.",
+      "sql": "SELECT id, project_id, title, status FROM workitems_items WHERE id = $id;",
+      "endpoints": [
+        { "method": "POST", "path": "/api/work-items/{id:guid}/complete" },
+        { "method": "GET", "path": "/api/work-items/{id:guid}" }
+      ]
+    },
+    {
+      "id": "workitems-update",
+      "label": "Update WorkItem",
+      "module": "WorkItems",
+      "file": "src/Modules/WorkItems/EngineeringModel.Modules.WorkItems.Infrastructure/SqliteWorkItemRepository.cs",
+      "function": "SqliteWorkItemRepository.UpdateAsync()",
+      "tables": ["workitems_items"],
+      "purpose": "Persist work-item status transitions (e.g. InProgress -> Completed).",
+      "sql": "UPDATE workitems_items SET title = $title, status = $status WHERE id = $id;",
+      "endpoints": [{ "method": "POST", "path": "/api/work-items/{id:guid}/complete" }]
+    }
+  ],
   "swaggerSchemas": {
     "matchStatus": "Not configured in this PoC",
     "schemas": []
   },
   "drift": {
     "overallStatus": "HEALTHY",
-    "observedAt": "2026-08-25",
+    "observedAt": "2026-08-26",
     "summary": {
-      "matches": 0,
+      "matches": 11,
       "conflicts": 0,
       "codeOnly": 0,
       "docsOnly": 0,
@@ -281,6 +367,11 @@
       "medium": 0,
       "low": 0
     },
-    "conflicts": []
+    "conflicts": [],
+    "notes": [
+      "Full parity audit 2026-08-26: module boundaries, ADR 0002 contract-only cross-module access, ADR 0003 SQLite ownership, and all 6 Minimal API endpoints verified against code with zero conflicts.",
+      "sqlQueries catalog was empty prior to this sync (CODE_ONLY vs. manifest); populated from the 7 observed repository/catalog queries across Projects and WorkItems.",
+      "Uncommitted working-tree changes observed but not architecture-significant: global.json SDK version loosened from 10.0.400 to 10.0 (rollForward: latestFeature); EngineeringModel.Api.csproj gained an explicit <TargetFramework>net10.0</TargetFramework> that duplicates the value already centralized in Directory.Build.props; a new untracked src/EngineeringModel.Api/Properties/launchSettings.json was added. None of these change module boundaries, endpoints, or tech stack facts already recorded in this manifest."
+    ]
   }
 }
