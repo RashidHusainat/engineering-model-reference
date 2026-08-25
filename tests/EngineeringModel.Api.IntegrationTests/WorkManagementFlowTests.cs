@@ -8,26 +8,12 @@ namespace EngineeringModel.Api.IntegrationTests;
 [TestFixture]
 public sealed class WorkManagementFlowTests
 {
-    private TestApiFactory factory = null!;
-    private HttpClient client = null!;
-
-    [SetUp]
-    public void SetUp()
-    {
-        factory = new TestApiFactory();
-        client = factory.CreateClient();
-    }
-
-    [TearDown]
-    public void TearDown()
-    {
-        client.Dispose();
-        factory.Dispose();
-    }
-
     [Test]
     public async Task WorkItem_CanBeCreatedOnlyAfterProjectIsActivated()
     {
+        using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+
         var createProjectResponse = await client.PostAsJsonAsync(
             "/api/projects/",
             new { Name = "Engineering Verification" });
@@ -62,6 +48,7 @@ public sealed class WorkManagementFlowTests
         completeResponse.EnsureSuccessStatusCode();
 
         var completed = await completeResponse.Content.ReadFromJsonAsync<WorkItemView>();
+        Assert.That(completed, Is.Not.Null);
         Assert.That(completed!.Status, Is.EqualTo("Completed"));
     }
 }
