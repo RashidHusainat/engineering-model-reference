@@ -1,0 +1,286 @@
+{
+  "meta": {
+    "title": "Engineering Model Reference — Living Architecture",
+    "version": "1.0.0",
+    "generatedAt": "2026-08-25",
+    "techStack": [
+      ".NET 10",
+      "ASP.NET Core",
+      "SQLite",
+      "NUnit",
+      "NetArchTest",
+      "Claude Code"
+    ]
+  },
+  "workspaces": [
+    {
+      "id": "api",
+      "name": "EngineeringModel.Api",
+      "type": "backend",
+      "description": "ASP.NET Core Minimal API composition root and HTTP boundary.",
+      "entrypoint": "src/EngineeringModel.Api/Program.cs"
+    }
+  ],
+  "infrastructure": [
+    {
+      "id": "sqlite",
+      "name": "SQLite",
+      "type": "database",
+      "description": "Portable PoC persistence. Projects and WorkItems own separate tables in one physical database."
+    }
+  ],
+  "dockerDiagram": {
+    "description": "No Docker services are required by this PoC.",
+    "nodes": [],
+    "edges": []
+  },
+  "c4": {
+    "context": {
+      "description": "A developer or API consumer interacts with the Engineering Model Reference system. Claude Code is an optional engineering accelerator, not a runtime dependency.",
+      "nodes": [
+        {
+          "id": "user",
+          "label": "Developer / API Consumer",
+          "type": "person"
+        },
+        {
+          "id": "system",
+          "label": "Engineering Model Reference",
+          "type": "system"
+        }
+      ],
+      "edges": [
+        {
+          "from": "user",
+          "to": "system",
+          "label": "HTTP / engineering workflow"
+        }
+      ]
+    },
+    "containers": {
+      "description": "One ASP.NET Core deployable and one SQLite data store keep the PoC portable.",
+      "nodes": [
+        {
+          "id": "api",
+          "label": "ASP.NET Core API",
+          "type": "app"
+        },
+        {
+          "id": "db",
+          "label": "SQLite Database",
+          "type": "database"
+        }
+      ],
+      "edges": [
+        {
+          "from": "api",
+          "to": "db",
+          "label": "Microsoft.Data.Sqlite"
+        }
+      ]
+    },
+    "components": [
+      {
+        "scope": "Projects Module",
+        "description": "Projects publishes a Contracts assembly as its cross-module surface.",
+        "nodes": [
+          {
+            "id": "projects_api",
+            "label": "API / Composition Root",
+            "type": "app"
+          },
+          {
+            "id": "projects_app",
+            "label": "Projects.Application",
+            "type": "component"
+          },
+          {
+            "id": "projects_domain",
+            "label": "Projects.Domain",
+            "type": "component"
+          },
+          {
+            "id": "projects_contracts",
+            "label": "Projects.Contracts",
+            "type": "component"
+          },
+          {
+            "id": "projects_infra",
+            "label": "Projects.Infrastructure",
+            "type": "component"
+          }
+        ],
+        "edges": [
+          {
+            "from": "projects_api",
+            "to": "projects_app",
+            "label": "handlers"
+          },
+          {
+            "from": "projects_api",
+            "to": "projects_infra",
+            "label": "wiring"
+          },
+          {
+            "from": "projects_app",
+            "to": "projects_domain",
+            "label": "domain model"
+          },
+          {
+            "from": "projects_infra",
+            "to": "projects_app",
+            "label": "repository port"
+          },
+          {
+            "from": "projects_infra",
+            "to": "projects_contracts",
+            "label": "published catalog implementation"
+          }
+        ]
+      },
+      {
+        "scope": "WorkItems + Published Contract",
+        "description": "WorkItems consumes Projects only through Projects.Contracts.",
+        "nodes": [
+          {
+            "id": "work_api",
+            "label": "API / Composition Root",
+            "type": "app"
+          },
+          {
+            "id": "work_app",
+            "label": "WorkItems.Application",
+            "type": "component"
+          },
+          {
+            "id": "work_domain",
+            "label": "WorkItems.Domain",
+            "type": "component"
+          },
+          {
+            "id": "work_infra",
+            "label": "WorkItems.Infrastructure",
+            "type": "component"
+          },
+          {
+            "id": "projects_contract",
+            "label": "Projects.Contracts",
+            "type": "component"
+          }
+        ],
+        "edges": [
+          {
+            "from": "work_api",
+            "to": "work_app",
+            "label": "handlers"
+          },
+          {
+            "from": "work_api",
+            "to": "work_infra",
+            "label": "wiring"
+          },
+          {
+            "from": "work_app",
+            "to": "work_domain",
+            "label": "domain model"
+          },
+          {
+            "from": "work_infra",
+            "to": "work_app",
+            "label": "repository port"
+          },
+          {
+            "from": "work_app",
+            "to": "projects_contract",
+            "label": "IProjectsCatalog"
+          }
+        ]
+      }
+    ]
+  },
+  "modules": [
+    {
+      "id": "projects",
+      "name": "Projects",
+      "basePath": "/api/projects",
+      "description": "Creates, reads and activates Projects.",
+      "permissions": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/",
+          "auth": false,
+          "permission": null,
+          "description": "Create a Draft project."
+        },
+        {
+          "method": "POST",
+          "path": "/{id:guid}/activate",
+          "auth": false,
+          "permission": null,
+          "description": "Activate a project."
+        },
+        {
+          "method": "GET",
+          "path": "/{id:guid}",
+          "auth": false,
+          "permission": null,
+          "description": "Get a project."
+        }
+      ]
+    },
+    {
+      "id": "work-items",
+      "name": "WorkItems",
+      "basePath": "/api/work-items",
+      "description": "Creates, reads and completes WorkItems. Creation requires an active Project.",
+      "permissions": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/",
+          "auth": false,
+          "permission": null,
+          "description": "Create a WorkItem for an active Project."
+        },
+        {
+          "method": "POST",
+          "path": "/{id:guid}/complete",
+          "auth": false,
+          "permission": null,
+          "description": "Complete a WorkItem."
+        },
+        {
+          "method": "GET",
+          "path": "/{id:guid}",
+          "auth": false,
+          "permission": null,
+          "description": "Get a WorkItem."
+        }
+      ]
+    }
+  ],
+  "permissions": {
+    "catalog": [],
+    "details": []
+  },
+  "sqlQueries": [],
+  "swaggerSchemas": {
+    "matchStatus": "Not configured in this PoC",
+    "schemas": []
+  },
+  "drift": {
+    "overallStatus": "HEALTHY",
+    "observedAt": "2026-08-25",
+    "summary": {
+      "matches": 0,
+      "conflicts": 0,
+      "codeOnly": 0,
+      "docsOnly": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "conflicts": []
+  }
+}

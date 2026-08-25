@@ -9,6 +9,7 @@ Before changing code, read only the context relevant to the task:
 
 - Business rules: `docs/business/work-management.md`
 - Architecture: `docs/architecture/overview.md`
+- Living architecture / drift dashboard: `docs/architecture/ARCH-WIKI.md`
 - Verification map: `docs/architecture/verification-map.md`
 - Decisions: `docs/decisions/`
 - Full engineering model: `docs/engineering-model/Engineering-Knowledge-Verification-Model.md`
@@ -39,6 +40,23 @@ Use the repository-owned verification entry point. Never create a Claude-only ve
 ```
 
 Before claiming a change is complete, run the profile appropriate to the change. CI remains authoritative.
+
+## Optional architecture visibility — arch-wiki
+
+`arch-wiki` may scan the codebase as **observed reality** and synchronize the living
+`docs/architecture/architecture.json` inventory. This does not mean accidental code
+becomes the intended architecture.
+
+When code disagrees with architecture docs or ADRs:
+
+1. capture the conflict before synchronization;
+2. show Expected vs Observed;
+3. include exact code and documentation locations;
+4. explain Why / Impact / Resolution;
+5. map the conflict to C4 (C1/C2/C3; C4 Code only on demand);
+6. preserve unresolved drift even after the living manifest is refreshed from code.
+
+Architecture tests and CI remain the deterministic enforcement path.
 
 ## Change discipline
 
